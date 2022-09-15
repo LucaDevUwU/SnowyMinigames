@@ -1,5 +1,6 @@
 package com.snowy.snowyminigames;
 
+import com.snowy.snowyminigames.command.ArenaCommand;
 import com.snowy.snowyminigames.listener.ConnectListener;
 import com.snowy.snowyminigames.listener.GameListener;
 import com.snowy.snowyminigames.manager.ArenaManager;
@@ -17,6 +18,8 @@ public final class SnowyMinigame extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new ConnectListener(this), this);
         Bukkit.getPluginManager().registerEvents(new GameListener(this), this);
+
+        getCommand("arena").setExecutor(new ArenaCommand(this));
     }
 
     public ArenaManager getArenaManager() { return arenaManager; }

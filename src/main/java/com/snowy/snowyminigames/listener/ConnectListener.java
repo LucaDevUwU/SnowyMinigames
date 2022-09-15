@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ConnectListener implements Listener {
 
     private SnowyMinigame minigame;
-    private ConnectListener (SnowyMinigame minigame) {
+    public ConnectListener (SnowyMinigame minigame) {
         this.minigame = minigame;
     }
 
