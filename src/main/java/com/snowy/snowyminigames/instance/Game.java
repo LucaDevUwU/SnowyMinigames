@@ -1,6 +1,7 @@
 package com.snowy.snowyminigames.instance;
 
 import com.snowy.snowyminigames.GameState;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -21,8 +22,13 @@ public class Game {
         arena.setState(GameState.LIVE);
         arena.sendMessage(ChatColor.GREEN + "GAME HAS STARTED: Your objective is to break 20 blocks in the fastest. Good luck!");
 
+        for (UUID uuid : arena.getKits().keySet()) {
+            arena.getKits().get(uuid).onStart(Bukkit.getPlayer(uuid));
+        }
+
         for (UUID uuid : arena.getPlayers()) {
             points.put(uuid, 0);
+            Bukkit.getPlayer(uuid).closeInventory();
         }
     }
 

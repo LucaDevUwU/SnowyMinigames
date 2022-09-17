@@ -1,0 +1,8 @@
+name: SnowyMinigames
+version: '${version}'
+main: com.snowy.snowyminigames.SnowyMinigame
+api-version: 1.19
+authors: [ SnowyyUwU ]
+description: Minigame Plugin
+commands:
+  arena:

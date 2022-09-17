@@ -2,6 +2,10 @@ package com.snowy.snowyminigames.instance;
 
 import com.snowy.snowyminigames.GameState;
 import com.snowy.snowyminigames.SnowyMinigame;
+import com.snowy.snowyminigames.kit.Kit;
+import com.snowy.snowyminigames.kit.KitType;
+import com.snowy.snowyminigames.kit.type.FighterKit;
+import com.snowy.snowyminigames.kit.type.MinerKit;
 import com.snowy.snowyminigames.manager.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +26,7 @@ public class Arena {
 
     private GameState state;
     private List<UUID> players;
+    private HashMap<UUID, Kit> kits;
     private Countdown countdown;
     private Game game;
 
@@ -31,6 +37,7 @@ public class Arena {
 
         this.state = GameState.RECRUITING;
         this.players = new ArrayList<>();
+        this.kits = new HashMap<>();
         this.countdown = new Countdown(minigame, this);
         this.game = new Game(this);
     }
@@ -42,10 +49,13 @@ public class Arena {
         if (kickPlayers) {
             Location loc = ConfigManager.getLobbySpawn();
             for (UUID uuid: players) {
-                Bukkit.getPlayer(uuid).teleport(loc);
+                Player player = Bukkit.getPlayer(uuid);
+                player.teleport(loc);
+                removeKit(player.getUniqueId());
             }
             players.clear();
         }
+        kits.clear();
         sendTitle("", "");
         state = GameState.RECRUITING;
         countdown.cancel();
@@ -71,6 +81,8 @@ public class Arena {
         players.add(player.getUniqueId());
         player.teleport(spawn);
 
+        player.sendMessage(ChatColor.GOLD + "Choose your kit with /arena kit!");
+
         if (state.equals(GameState.RECRUITING) && players.size() >= ConfigManager.getRequiredPlayer()) {
             countdown.start();
         }
@@ -80,6 +92,8 @@ public class Arena {
         players.remove(player.getUniqueId());
         player.teleport(ConfigManager.getLobbySpawn());
         player.sendTitle("", "");
+
+        removeKit(player.getUniqueId());
 
         if (state == GameState.COUNTDOWN && players.size() < ConfigManager.getRequiredPlayer()) {
             sendMessage(ChatColor.RED + "There is not enough players. Countdown Stopped");
@@ -101,4 +115,25 @@ public class Arena {
     public Game getGame() { return game; }
 
     public void setState(GameState state) { this.state = state; }
+    public HashMap<UUID, Kit> getKits() { return kits; }
+
+    public void removeKit(UUID uuid) {
+        if (kits.containsKey(uuid)) {
+            kits.get(uuid).remove();
+            kits.remove(uuid);
+        }
+    }
+
+    public void setKit(UUID uuid, KitType type) {
+        removeKit(uuid);
+        if (type == KitType.MINER) {
+            kits.put(uuid, new MinerKit(minigame, uuid));
+        } else if (type == KitType.FIGHTER) {
+            kits.put(uuid, new FighterKit(minigame, uuid));
+        }
+    }
+
+    public KitType getKitType(Player player) {
+        return kits.containsKey(player.getUniqueId()) ? kits.get(player.getUniqueId()).getType() : null;
+    }
 }
