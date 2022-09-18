@@ -4,6 +4,7 @@ import com.snowy.snowyminigames.GameState;
 import com.snowy.snowyminigames.SnowyMinigame;
 import com.snowy.snowyminigames.instance.Arena;
 import com.snowy.snowyminigames.kit.KitUI;
+import com.snowy.snowyminigames.team.TeamUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,6 +27,17 @@ public class ArenaCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.GREEN + "These are the available arenas:");
                 for (Arena arena : minigame.getArenaManager().getArenas()) {
                     player.sendMessage(ChatColor.GREEN + "- " + arena.getId() + "(" + arena.getState().name() + ")");
+                }
+            } else if (args.length == 1 && args[0].equalsIgnoreCase("team")) {
+                Arena arena = minigame.getArenaManager().getArena(player);
+                if (arena != null) {
+                    if (arena.getState() != GameState.LIVE){
+                        new TeamUI(arena, player);
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You cannout use this command right now");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "You are not in an arena");
                 }
             } else if (args.length == 1 && args[0].equalsIgnoreCase("kit")) {
                 Arena arena = minigame.getArenaManager().getArena(player);
@@ -77,6 +89,7 @@ public class ArenaCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.RED + "- /arena join");
                 player.sendMessage(ChatColor.RED + "- /arena leave <id>");
                 player.sendMessage(ChatColor.RED + "- /arena kit");
+                player.sendMessage(ChatColor.RED + "- /arena team");
 
             }
         }

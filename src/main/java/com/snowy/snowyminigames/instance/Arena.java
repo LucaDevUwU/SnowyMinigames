@@ -1,5 +1,6 @@
 package com.snowy.snowyminigames.instance;
 
+import com.google.common.collect.TreeMultimap;
 import com.snowy.snowyminigames.GameState;
 import com.snowy.snowyminigames.SnowyMinigame;
 import com.snowy.snowyminigames.kit.Kit;
@@ -7,6 +8,7 @@ import com.snowy.snowyminigames.kit.KitType;
 import com.snowy.snowyminigames.kit.type.FighterKit;
 import com.snowy.snowyminigames.kit.type.MinerKit;
 import com.snowy.snowyminigames.manager.ConfigManager;
+import com.snowy.snowyminigames.team.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,17 +28,20 @@ public class Arena {
 
     private GameState state;
     private List<UUID> players;
+    private HashMap<UUID, Team> teams;
     private HashMap<UUID, Kit> kits;
     private Countdown countdown;
     private Game game;
 
     public Arena(SnowyMinigame minigame, int id, Location spawn) {
         this.minigame = minigame;
+
         this.id = id;
         this.spawn = spawn;
 
-        this.state = GameState.RECRUITING;
+        setState(GameState.RECRUITING);
         this.players = new ArrayList<>();
+        this.teams = new HashMap<>();
         this.kits = new HashMap<>();
         this.countdown = new Countdown(minigame, this);
         this.game = new Game(this);
@@ -54,6 +59,7 @@ public class Arena {
                 removeKit(player.getUniqueId());
             }
             players.clear();
+            teams.clear();
         }
         kits.clear();
         sendTitle("", "");
@@ -83,6 +89,16 @@ public class Arena {
 
         player.sendMessage(ChatColor.GOLD + "Choose your kit with /arena kit!");
 
+        TreeMultimap<Integer, Team> count = TreeMultimap.create();
+        for (Team team : Team.values()) {
+            count.put(getTeamCount(team), team);
+        }
+
+        Team lowest = (Team) count.values().toArray()[0];
+        setTeam(player, lowest);
+
+        player.sendMessage(ChatColor.AQUA + "You have been automatically placed on " + lowest.getDisplay() + ChatColor.AQUA + " team.");
+
         if (state.equals(GameState.RECRUITING) && players.size() >= ConfigManager.getRequiredPlayer()) {
             countdown.start();
         }
@@ -92,6 +108,8 @@ public class Arena {
         players.remove(player.getUniqueId());
         player.teleport(ConfigManager.getLobbySpawn());
         player.sendTitle("", "");
+
+        removeTeam(player);
 
         removeKit(player.getUniqueId());
 
@@ -116,6 +134,28 @@ public class Arena {
 
     public void setState(GameState state) { this.state = state; }
     public HashMap<UUID, Kit> getKits() { return kits; }
+    public void setTeam(Player player, Team team) {
+        removeTeam(player);
+        teams.put(player.getUniqueId(), team);
+    }
+
+    public void removeTeam(Player player) {
+        if (teams.containsKey(player.getUniqueId())) {
+            teams.remove(player.getUniqueId());
+        }
+    }
+
+    public int getTeamCount(Team team) {
+        int amount = 0;
+        for (Team t : teams.values()) {
+            if (t == team) {
+                amount++;
+            }
+        }
+        return amount;
+    }
+
+    public Team getTeam(Player player) { return teams.get(player.getUniqueId()); }
 
     public void removeKit(UUID uuid) {
         if (kits.containsKey(uuid)) {

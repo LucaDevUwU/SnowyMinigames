@@ -4,6 +4,7 @@ import com.snowy.snowyminigames.GameState;
 import com.snowy.snowyminigames.SnowyMinigame;
 import com.snowy.snowyminigames.instance.Arena;
 import com.snowy.snowyminigames.kit.KitType;
+import com.snowy.snowyminigames.team.Team;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,6 +22,22 @@ public class GameListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
+
+        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("Team Selection")) {
+            Team team = Team.valueOf(e.getCurrentItem().getItemMeta().getLocalizedName());
+
+            Arena arena = minigame.getArenaManager().getArena(player);
+            if (arena != null) {
+                if (arena.getTeam(player) == team) {
+                    player.sendMessage(ChatColor.RED + "You are already on this team");
+                } else {
+                    player.sendMessage(ChatColor.AQUA + "You are now on " + team.getDisplay() + ChatColor.AQUA + " team!");
+                    arena.setTeam(player, team);
+                }
+            }
+            player.closeInventory();
+            e.setCancelled(true);
+        }
 
         if (e.getView().getTitle().contains("Kit Selection") && e.getInventory() != null && e.getCurrentItem() != null) {
             e.setCancelled(true);

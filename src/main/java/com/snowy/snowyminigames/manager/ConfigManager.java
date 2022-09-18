@@ -20,7 +20,7 @@ public class ConfigManager {
 
     public static Location getLobbySpawn() {
         return new Location(
-                Bukkit.getWorld(config.getString("lobby-spawn")),
+                Bukkit.getWorld(config.getString("lobby-spawn.world")),
                 config.getDouble("lobby-spawn.x"),
                 config.getDouble("lobby-spawn.y"),
                 config.getDouble("lobby-spawn.z"),
