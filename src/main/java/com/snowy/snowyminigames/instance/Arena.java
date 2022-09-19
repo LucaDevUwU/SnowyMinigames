@@ -9,9 +9,7 @@ import com.snowy.snowyminigames.kit.type.FighterKit;
 import com.snowy.snowyminigames.kit.type.MinerKit;
 import com.snowy.snowyminigames.manager.ConfigManager;
 import com.snowy.snowyminigames.team.Team;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -50,8 +48,8 @@ public class Arena {
     /* GAME */
     public void start() { game.start(); }
 
-    public void reset(boolean kickPlayers) {
-        if (kickPlayers) {
+    public void reset() {
+        if (state == GameState.LIVE) {
             Location loc = ConfigManager.getLobbySpawn();
             for (UUID uuid: players) {
                 Player player = Bukkit.getPlayer(uuid);
@@ -60,7 +58,13 @@ public class Arena {
             }
             players.clear();
             teams.clear();
+
+            String worldName = spawn.getWorld().getName();
+            Bukkit.unloadWorld(spawn.getWorld(), false);
+            World world = Bukkit.createWorld(new WorldCreator(worldName));
+            world.setAutoSave(false);
         }
+
         kits.clear();
         sendTitle("", "");
         state = GameState.RECRUITING;
@@ -115,13 +119,13 @@ public class Arena {
 
         if (state == GameState.COUNTDOWN && players.size() < ConfigManager.getRequiredPlayer()) {
             sendMessage(ChatColor.RED + "There is not enough players. Countdown Stopped");
-            reset(false);
+            reset();
             return;
         }
 
         if (state == GameState.LIVE && players.size() < ConfigManager.getRequiredPlayer()) {
             sendMessage(ChatColor.RED + "The game has ended as too many players have left");
-            reset(false);
+            reset();
         }
     }
 
