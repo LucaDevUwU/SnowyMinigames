@@ -30,6 +30,7 @@ public class Arena {
     private HashMap<UUID, Kit> kits;
     private Countdown countdown;
     private Game game;
+    private boolean canJoin;
 
     public Arena(SnowyMinigame minigame, int id, Location spawn) {
         this.minigame = minigame;
@@ -43,6 +44,7 @@ public class Arena {
         this.kits = new HashMap<>();
         this.countdown = new Countdown(minigame, this);
         this.game = new Game(this);
+        this.canJoin = true;
     }
 
     /* GAME */
@@ -50,6 +52,7 @@ public class Arena {
 
     public void reset() {
         if (state == GameState.LIVE) {
+            this.canJoin = false;
             Location loc = ConfigManager.getLobbySpawn();
             for (UUID uuid: players) {
                 Player player = Bukkit.getPlayer(uuid);
@@ -131,10 +134,13 @@ public class Arena {
 
     /* INFO */
     public int getId() { return id; }
+    public World getWorld() { return spawn.getWorld(); }
 
     public GameState getState() { return state; }
     public List<UUID> getPlayers() { return players; }
     public Game getGame() { return game; }
+    public boolean canJoin() { return canJoin; }
+    public void toggleCanJoin() { this.canJoin = !canJoin; }
 
     public void setState(GameState state) { this.state = state; }
     public HashMap<UUID, Kit> getKits() { return kits; }

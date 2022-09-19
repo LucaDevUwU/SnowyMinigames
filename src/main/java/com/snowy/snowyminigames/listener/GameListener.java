@@ -11,12 +11,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 public class GameListener implements Listener {
 
     private SnowyMinigame minigame;
     public GameListener (SnowyMinigame minigame) {
         this.minigame = minigame;
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent e) {
+        Arena arena = minigame.getArenaManager().getArena(e.getWorld());
+        if (arena != null) {
+            arena.toggleCanJoin();
+        }
     }
 
     @EventHandler

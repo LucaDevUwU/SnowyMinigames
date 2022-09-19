@@ -75,8 +75,13 @@ public class ArenaCommand implements CommandExecutor {
                 if (id >= 0 && id < minigame.getArenaManager().getArenas().size()) {
                     Arena arena = minigame.getArenaManager().getArena(id);
                     if (arena.getState() == GameState.RECRUITING || arena.getState() == GameState.COUNTDOWN) {
-                        player.sendMessage(ChatColor.GREEN + "You are now playing in Arena" + id + ".");
-                        arena.addPlayer(player);
+                        if (arena.canJoin()) {
+                            player.sendMessage(ChatColor.GREEN + "You are now playing in Arena" + id + ".");
+                            arena.addPlayer(player);
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You can't join this arena yet. Map is still loading");
+                        }
+
                     } else {
                         player.sendMessage(ChatColor.RED + "You can't join this arena yet");
                     }
