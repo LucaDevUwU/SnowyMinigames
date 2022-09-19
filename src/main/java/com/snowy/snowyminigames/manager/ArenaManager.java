@@ -4,6 +4,8 @@ import com.snowy.snowyminigames.instance.Arena;
 import com.snowy.snowyminigames.SnowyMinigame;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -18,6 +20,9 @@ public class ArenaManager {
         FileConfiguration config = minigame.getConfig();
 
         for (String str : config.getConfigurationSection("arenas.").getKeys(false)) {
+            World world = Bukkit.createWorld(new WorldCreator(config.getString("arenas." + str + ".world")));
+            world.setAutoSave(false);
+
             arenas.add(new Arena(minigame, Integer.parseInt(str), new Location(
                     Bukkit.getWorld(config.getString("arenas." + str + ".world")),
                     config.getDouble("arenas." + str + ".x"),
