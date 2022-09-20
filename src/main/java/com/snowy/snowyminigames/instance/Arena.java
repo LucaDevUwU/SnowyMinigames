@@ -10,6 +10,7 @@ import com.snowy.snowyminigames.kit.type.MinerKit;
 import com.snowy.snowyminigames.manager.ConfigManager;
 import com.snowy.snowyminigames.team.Team;
 import org.bukkit.*;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class Arena {
     private SnowyMinigame minigame;
 
     private int id;
-    private Location spawn;
+    private Location spawn, sign;
 
     private GameState state;
     private List<UUID> players;
@@ -32,11 +33,12 @@ public class Arena {
     private Game game;
     private boolean canJoin;
 
-    public Arena(SnowyMinigame minigame, int id, Location spawn) {
+    public Arena(SnowyMinigame minigame, int id, Location spawn, Location sign) {
         this.minigame = minigame;
 
         this.id = id;
         this.spawn = spawn;
+        this.sign = sign;
 
         setState(GameState.RECRUITING);
         this.players = new ArrayList<>();
@@ -52,6 +54,7 @@ public class Arena {
 
     public void reset() {
         if (state == GameState.LIVE) {
+            state = GameState.RECRUITING;
             this.canJoin = false;
             Location loc = ConfigManager.getLobbySpawn();
             for (UUID uuid: players) {
@@ -70,7 +73,6 @@ public class Arena {
 
         kits.clear();
         sendTitle("", "");
-        state = GameState.RECRUITING;
         countdown.cancel();
         countdown = new Countdown(minigame, this);
         game = new Game(this);
@@ -87,6 +89,15 @@ public class Arena {
         for (UUID uuid : players) {
             Bukkit.getPlayer(uuid).sendTitle(title, subtitle);
         }
+    }
+
+    public void updateSign(String line1, String line2, String line3, String line4) {
+        Sign signBlock = (Sign) sign.getBlock().getState();
+        signBlock.setLine(0, line1);
+        signBlock.setLine(1, line2);
+        signBlock.setLine(2, line3);
+        signBlock.setLine(3, line4);
+        signBlock.update();
     }
 
     /* PLAYERS */
@@ -130,10 +141,15 @@ public class Arena {
             sendMessage(ChatColor.RED + "The game has ended as too many players have left");
             reset();
         }
+
+        if (state == GameState.LIVE) {
+            updateSign("Arena" + id, state.name(), "", "Players: " + players.size());
+        }
     }
 
     /* INFO */
     public int getId() { return id; }
+    public  Location getSignLocation() { return sign; }
     public World getWorld() { return spawn.getWorld(); }
 
     public GameState getState() { return state; }
@@ -142,7 +158,10 @@ public class Arena {
     public boolean canJoin() { return canJoin; }
     public void toggleCanJoin() { this.canJoin = !canJoin; }
 
-    public void setState(GameState state) { this.state = state; }
+    public void setState(GameState state) {
+        this.state = state;
+        updateSign("Arena" + id, state.name(), "", state == GameState.LIVE ? "Players: " + players.size() : "");
+    }
     public HashMap<UUID, Kit> getKits() { return kits; }
     public void setTeam(Player player, Team team) {
         removeTeam(player);

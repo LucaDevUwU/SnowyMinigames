@@ -9,16 +9,28 @@ lobby-spawn:
   pitch: 4.6
 arenas:
   0:
-    world: 'arena1'
-    x: 25.564
-    y: 159
-    z: 31.528
-    yaw: 175.5
-    pitch: -1.6
+    sign:
+      world: 'world'
+      x: 192
+      y: 85
+      z: -400
+    player-spawn:
+      world: 'arena1'
+      x: 25.564
+      y: 159
+      z: 31.528
+      yaw: 175.5
+      pitch: -1.6
   1:
-    world: 'arena2'
-    x: -0.504
-    y: 67
-    z: -0.416
-    yaw: 2.2
-    pitch: -3.2
+    sign:
+      world: 'world'
+      x: 191
+      y: 85
+      z: -400
+    player-spawn:
+      world: 'arena2'
+      x: -0.504
+      y: 67
+      z: -0.416
+      yaw: 2.2
+      pitch: -3.2
