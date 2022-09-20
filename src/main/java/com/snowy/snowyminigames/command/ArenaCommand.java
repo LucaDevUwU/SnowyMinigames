@@ -4,6 +4,7 @@ import com.snowy.snowyminigames.GameState;
 import com.snowy.snowyminigames.SnowyMinigame;
 import com.snowy.snowyminigames.instance.Arena;
 import com.snowy.snowyminigames.kit.KitUI;
+import com.snowy.snowyminigames.manager.LangManager;
 import com.snowy.snowyminigames.team.TeamUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -53,7 +54,7 @@ public class ArenaCommand implements CommandExecutor {
             } else if (args.length == 1 && args[0].equalsIgnoreCase("leave")) {
                 Arena arena = minigame.getArenaManager().getArena(player);
                 if (arena != null) {
-                    player.sendMessage(ChatColor.RED + "You left the arena.");
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', LangManager.getLeaveArena()));
                     arena.removePlayer(player);
                 } else {
                     player.sendMessage(ChatColor.RED + "You are not in an arena");
