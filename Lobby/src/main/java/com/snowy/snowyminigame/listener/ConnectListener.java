@@ -1,7 +1,9 @@
-package com.snowy.snowyminigames.listener;
+package com.snowy.snowyminigame.listener;
 
+import com.snowy.snowyminigame.Lobby;
 import com.snowy.snowyminigames.SnowyMinigame;
 import com.snowy.snowyminigames.instance.Arena;
+import com.snowy.snowyminigames.manager.ConfigManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -9,13 +11,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ConnectListener implements Listener {
 
-    private SnowyMinigame minigame;
-    public ConnectListener (SnowyMinigame minigame) {
+    private Lobby minigame;
+    public ConnectListener(Lobby minigame) {
         this.minigame = minigame;
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+        e.getPlayer().teleport(ConfigManager.getLobbySpawn());
     }
 
     @EventHandler
