@@ -1,0 +1,5 @@
+name: SnowyMinigame
+version: '${version}'
+main: com.snowy.snowyminigame.SnowyMinigame
+api-version: 1.19
+authors: [ Snowyy ]
